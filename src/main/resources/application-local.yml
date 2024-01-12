@@ -1,7 +1,7 @@
 # we can have the specific settings in here for local server
 
 server:
-  port: 8080
+  port: 8081
 
 # settings for database such as mysql
 spring:
