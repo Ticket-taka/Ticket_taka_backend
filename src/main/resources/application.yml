@@ -3,6 +3,7 @@ spring:
   # settings for profile
   profiles:
     default: dev  # if you want to have the environment of the develop server, then it should be dev not local
+    include: secret
 
   # settings for multipart data such as image
   servlet:
