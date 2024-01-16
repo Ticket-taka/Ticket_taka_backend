@@ -21,7 +21,8 @@ public enum ErrorStatus implements BaseErrorCode {
     //MEMBER Error
     MEMBER_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "MEMBER4000", "Member unauthorized"),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4001", "Member Not found"),
-    MEMBER_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "MEMBER4002", "Member already exists");
+    MEMBER_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "MEMBER4002", "Member already exists"),
+    MEMBER_WRONG_INFORMATION(HttpStatus.BAD_REQUEST, "MEMBER4003", "Member information you entered is not valid.");
 
 
     private final HttpStatus httpStatus;
