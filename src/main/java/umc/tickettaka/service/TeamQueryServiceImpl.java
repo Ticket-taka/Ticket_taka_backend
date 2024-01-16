@@ -1,5 +1,6 @@
 package umc.tickettaka.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,5 +19,10 @@ public class TeamQueryServiceImpl implements TeamQueryService{
     @Override
     public Optional<Team> findTeam(Long id) {
         return teamRepository.findById(id);
+    }
+
+    @Override
+    public List<Team> findAll() {
+        return teamRepository.findAll();
     }
 }
