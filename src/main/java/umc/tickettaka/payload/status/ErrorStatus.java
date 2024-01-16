@@ -5,9 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import umc.tickettaka.payload.BaseErrorCode;
 import umc.tickettaka.payload.dto.ErrorReasonDto;
-import umc.tickettaka.payload.exception.GeneralException;
-
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Predicate;
 
