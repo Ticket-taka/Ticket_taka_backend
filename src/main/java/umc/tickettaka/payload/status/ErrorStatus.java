@@ -41,6 +41,7 @@ public enum ErrorStatus implements BaseErrorCode {
     //PROJECT Error
     PROJECT_NAME_NOT_EXIST(HttpStatus.BAD_REQUEST,"PROJECT4000","Name hasn't entered"),
     INVALID_TEAM_ASSOCIATION(HttpStatus.BAD_REQUEST, "PROJECT4001", "Invalid team association for the project"),
+    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND,"PROJECT4002","Project doesn't exist"),
     PROJECT_IMAGE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "PROJECT5000", "Error uploading project image"),
     //TEAM Error
     TEAM_NAME_NOT_EXIST(HttpStatus.BAD_REQUEST, "TEAM4000", "Invalid team creation request"),
