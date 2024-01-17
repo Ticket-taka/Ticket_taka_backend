@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import umc.tickettaka.payload.BaseErrorCode;
 import umc.tickettaka.payload.dto.ErrorReasonDto;
+import umc.tickettaka.payload.exception.GeneralException;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -25,6 +27,8 @@ public enum ErrorStatus implements BaseErrorCode {
     EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST,"MEMBER4003", "Email already exists"),
     MEMBER_WRONG_INFORMATION(HttpStatus.BAD_REQUEST, "MEMBER4004", "Member information you entered is not valid."),
     TEAM_ALREADY_ASSIGNED(HttpStatus.BAD_REQUEST,"MEMBER4005", "Team is already assigned to the member"),
+    MEMBER_WRONG_INFORMATION(HttpStatus.BAD_REQUEST, "MEMBER4006", "Member information you entered is not valid."),
+  
     //MEMBER_TOKEN Error
     INVALID_TOKEN(HttpStatus.BAD_REQUEST,"TOKEN4001", "Invalid token"),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED,"TOKEN4002", "Token has expired"),
@@ -50,7 +54,7 @@ public enum ErrorStatus implements BaseErrorCode {
     TEAM_NAME_NOT_EXIST(HttpStatus.BAD_REQUEST, "TEAM4000", "Invalid team creation request"),
     INVALID_MEMBER_ASSOCIATION(HttpStatus.BAD_REQUEST, "TEAM4001", "Invalid member association for the team"),
     INVALID_SCHEDULE_TEAM_ASSOCIATION(HttpStatus.BAD_REQUEST, "TEAM4002", "Invalid schedule team association for the team");
-
+    TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "TEAM4003", "TEAM Not found");
 
     private final HttpStatus httpStatus;
     private final String code;
