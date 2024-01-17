@@ -8,8 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import umc.tickettaka.config.security.jwt.CustomUserDetailService;
 import umc.tickettaka.config.security.jwt.JwtTokenProvider;
-import umc.tickettaka.service.CustomUserDetailService;
 
 import java.io.IOException;
 
