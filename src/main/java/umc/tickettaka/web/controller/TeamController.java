@@ -44,7 +44,7 @@ public class TeamController {
             @Parameter(name = "teamsId", description = "팀의 아이디, path variable 입니다.")
     })
     public ApiResponse<TeamResponseDto.TeamDto> getTeam(@PathVariable(name = "teamsId") Long teamsId ) {
-        Team team = teamQueryService.findTeam(teamsId);
+        Team team = teamQueryService.findTeam(teamsId).get();
         return ApiResponse.onSuccess(TeamConverter.toTeamResultDto(team));
     }
 }

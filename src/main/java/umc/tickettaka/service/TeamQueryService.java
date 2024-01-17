@@ -5,6 +5,6 @@ import umc.tickettaka.domain.Team;
 import java.util.Optional;
 
 public interface TeamQueryService {
-    Team findTeam(Long id);
+    Optional<Team> findTeam(Long id);
     List<Team> findAll();
 }

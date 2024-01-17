@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import umc.tickettaka.payload.BaseErrorCode;
 import umc.tickettaka.payload.dto.ErrorReasonDto;
 import umc.tickettaka.payload.exception.GeneralException;
-
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -25,10 +24,37 @@ public enum ErrorStatus implements BaseErrorCode {
     MEMBER_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "MEMBER4000", "Member unauthorized"),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4001", "Member Not found"),
     MEMBER_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "MEMBER4002", "Member already exists"),
-    MEMBER_WRONG_INFORMATION(HttpStatus.BAD_REQUEST, "MEMBER4003", "Member information you entered is not valid."),
+    EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST,"MEMBER4003", "Email already exists"),
+    MEMBER_WRONG_INFORMATION(HttpStatus.BAD_REQUEST, "MEMBER4004", "Member information you entered is not valid."),
+    TEAM_ALREADY_ASSIGNED(HttpStatus.BAD_REQUEST,"MEMBER4005", "Team is already assigned to the member"),
+    MEMBER_WRONG_INFORMATION(HttpStatus.BAD_REQUEST, "MEMBER4006", "Member information you entered is not valid."),
+  
+    //MEMBER_TOKEN Error
+    INVALID_TOKEN(HttpStatus.BAD_REQUEST,"TOKEN4001", "Invalid token"),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED,"TOKEN4002", "Token has expired"),
+    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND,"TOKEN4003", "Token not found"),
+    UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED,"TOKEN4004", "Unauthorized access, token is not valid for this operation"),
+
+    //TICKET Error
+    INVALID_TICKET(HttpStatus.BAD_REQUEST,"TICKET4000","Invalid ticket creation request"),
+    TICKET_NOT_FOUND(HttpStatus.NOT_FOUND,"TICKET4001","Ticket Not found"),
+    TICKET_TIME_ERROR(HttpStatus.BAD_REQUEST, "TICKET4002", "Error assigning worker or reviewer to the ticket"),
+    INVALID_TICKET_TIME(HttpStatus.BAD_REQUEST, "TICKET4003", "end time is faster than start time"),
+
+    //TIMELINE Error
+    TIMELINE_NAME_NOT_EXIST(HttpStatus.BAD_REQUEST, "TIMELINE4000", "Name hasn't entered"),
+    INVALID_PROJECT_ASSOCIATION(HttpStatus.BAD_REQUEST, "TIMELINE4001", "Invalid project association for the timeline"),
+
+    //PROJECT Error
+    PROJECT_NAME_NOT_EXIST(HttpStatus.BAD_REQUEST,"PROJECT4000","Name hasn't entered"),
+    INVALID_TEAM_ASSOCIATION(HttpStatus.BAD_REQUEST, "PROJECT4001", "Invalid team association for the project"),
+    PROJECT_IMAGE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "PROJECT5000", "Error uploading project image"),
 
     //TEAM Error
-    TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "TEAM4001", "TEAM Not found");
+    TEAM_NAME_NOT_EXIST(HttpStatus.BAD_REQUEST, "TEAM4000", "Invalid team creation request"),
+    INVALID_MEMBER_ASSOCIATION(HttpStatus.BAD_REQUEST, "TEAM4001", "Invalid member association for the team"),
+    INVALID_SCHEDULE_TEAM_ASSOCIATION(HttpStatus.BAD_REQUEST, "TEAM4002", "Invalid schedule team association for the team");
+    TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "TEAM4003", "TEAM Not found");
 
     private final HttpStatus httpStatus;
     private final String code;
