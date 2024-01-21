@@ -49,7 +49,8 @@ public enum ErrorStatus implements BaseErrorCode {
     INVALID_MEMBER_ASSOCIATION(HttpStatus.BAD_REQUEST, "TEAM4001", "Invalid member association for the team"),
     INVALID_SCHEDULE_TEAM_ASSOCIATION(HttpStatus.BAD_REQUEST, "TEAM4002", "Invalid schedule team association for the team"),
     TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "TEAM4003", "TEAM Not found"),
-
+    //INVITATION Error
+    INVITATION_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "INVITATION4000", "The user is already invited to the team."),
     //SNS LOGIN Error
     SNS_LOGIN_WRONG_INFORMATION(HttpStatus.BAD_REQUEST, "SNS4003", "SNS information you entered is not valid.");
 

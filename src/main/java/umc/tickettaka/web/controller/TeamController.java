@@ -9,12 +9,18 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import umc.tickettaka.config.security.jwt.AuthUser;
+import umc.tickettaka.converter.InvitationConverter;
 import umc.tickettaka.converter.TeamConverter;
+import umc.tickettaka.domain.Invitation;
 import umc.tickettaka.domain.Member;
 import umc.tickettaka.domain.Team;
 import umc.tickettaka.payload.ApiResponse;
+import umc.tickettaka.service.InvitationCommandService;
+import umc.tickettaka.service.MemberQueryService;
 import umc.tickettaka.service.TeamQueryService;
+import umc.tickettaka.web.dto.request.InvitationRequestDto;
 import umc.tickettaka.web.dto.request.TeamRequestDto;
+import umc.tickettaka.web.dto.response.InvitationResponseDto;
 import umc.tickettaka.web.dto.response.TeamResponseDto;
 import umc.tickettaka.service.TeamCommandService;
 
@@ -27,6 +33,8 @@ public class TeamController {
 
     private final TeamCommandService teamCommandService;
     private final TeamQueryService teamQueryService;
+    private final MemberQueryService memberQueryService;
+    private final InvitationCommandService invitationCommandService;
 
     @PostMapping(value = "/create", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE})
     @Operation(summary = "Team 생성 API", description = "Team 생성하는 API")
@@ -79,5 +87,22 @@ public class TeamController {
         List<Team> teamList = teamQueryService.findAll();
         TeamResponseDto.TeamListDto teamListDto = TeamConverter.toTeamListDto(teamList);
         return ApiResponse.onSuccess(teamListDto);
+    }
+
+    @PostMapping("/{teamsId}/invite")
+    @Operation(summary = "팀에 멤버 초대 API", description = "팀에 멤버 초대 API")
+    @Parameters({
+            @Parameter(name = "teamsId", description = "팀의 아이디, path variable 입니다.")
+    })
+    public ApiResponse<InvitationResponseDto.InvitationDto> inviteTeam(
+            @PathVariable(name = "teamsId") Long teamsId,
+            @AuthUser Member sender,
+            @RequestBody InvitationRequestDto.CreateInvitationDto request) throws IOException {
+
+        Team team = teamQueryService.findTeam(teamsId);
+        Member receiver = memberQueryService.findByUsername(request.getReceiverUsername());
+        Invitation invitation = invitationCommandService.sendInvitation(sender, team, receiver);
+
+        return ApiResponse.onSuccess(InvitationConverter.invitationDto(invitation));
     }
 }
