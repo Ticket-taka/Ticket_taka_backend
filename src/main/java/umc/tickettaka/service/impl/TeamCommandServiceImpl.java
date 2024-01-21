@@ -2,17 +2,21 @@ package umc.tickettaka.service.impl;
 
 import java.io.IOException;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import umc.tickettaka.converter.TeamConverter;
+import umc.tickettaka.domain.Invitation;
 import umc.tickettaka.domain.Member;
 import umc.tickettaka.domain.Project;
 import umc.tickettaka.domain.Team;
+import umc.tickettaka.domain.enums.InvitationStatus;
 import umc.tickettaka.domain.mapping.MemberTeam;
 import umc.tickettaka.domain.mapping.ScheduleTeam;
+import umc.tickettaka.repository.InvitationRepository;
 import umc.tickettaka.repository.MemberTeamRepository;
 import umc.tickettaka.service.ImageUploadService;
 import umc.tickettaka.service.MemberQueryService;
@@ -45,11 +49,11 @@ public class TeamCommandServiceImpl implements TeamCommandService {
 
     private void setMemberTeam(Member creator, Team team, List<String> invitedUsernameList) {
         List<MemberTeam> memberTeamList = new java.util.ArrayList<>(invitedUsernameList.stream()
-            .map(username ->
-                MemberTeam.builder()
-                    .team(team)
-                    .member(memberQueryService.findByUsername(username))
-                    .build()).toList());
+                .map(username ->
+                        MemberTeam.builder()
+                                .team(team)
+                                .member(memberQueryService.findByUsername(username))
+                                .build()).toList());
 
         memberTeamList.add(MemberTeam.builder().team(team).member(creator).build());
         memberTeamRepository.saveAll(memberTeamList);
@@ -84,4 +88,5 @@ public class TeamCommandServiceImpl implements TeamCommandService {
         Team team = teamQueryService.findTeam(id);
         teamRepository.delete(team);
     }
+
 }
