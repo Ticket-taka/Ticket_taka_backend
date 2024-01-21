@@ -11,8 +11,7 @@ import umc.tickettaka.payload.exception.GeneralException;
 import umc.tickettaka.payload.status.ErrorStatus;
 import umc.tickettaka.repository.InvitationRepository;
 import umc.tickettaka.service.InvitationCommandService;
-import umc.tickettaka.service.MemberQueryService;
-import umc.tickettaka.service.TeamQueryService;
+import umc.tickettaka.service.InvitationQueryService;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +19,7 @@ import umc.tickettaka.service.TeamQueryService;
 public class InvitationCommandServiceImpl implements InvitationCommandService {
 
     private final InvitationRepository invitationRepository;
+    private final InvitationQueryService invitationQueryService;
 
     @Override
     public Invitation sendInvitation(Member sender, Team team, Member receiver) {
@@ -39,5 +39,41 @@ public class InvitationCommandServiceImpl implements InvitationCommandService {
                 .build();
 
         return invitationRepository.save(invitation);
+    }
+
+    @Override
+    public Invitation acceptInvitation(Long id, Member receiver) {
+        Invitation invitation = invitationQueryService.findInvitation(id);
+
+        if (receiver.getId().equals(invitation.getReceiver().getId())) {
+            invitation = Invitation.builder()
+                    .id(id)
+                    .team(invitation.getTeam())
+                    .receiver(invitation.getReceiver())
+                    .sender(invitation.getSender())
+                    .status(InvitationStatus.ACCEPT)
+                    .build();
+            return invitationRepository.save(invitation);
+        } else {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+    }
+
+    @Override
+    public Invitation rejectInvitation(Long id, Member receiver) {
+        Invitation invitation = invitationQueryService.findInvitation(id);
+
+        if (receiver.getId().equals(invitation.getReceiver().getId())) {
+            invitation = Invitation.builder()
+                    .id(id)
+                    .team(invitation.getTeam())
+                    .receiver(invitation.getReceiver())
+                    .sender(invitation.getSender())
+                    .status(InvitationStatus.REJECT)
+                    .build();
+            return invitationRepository.save(invitation);
+        } else {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
     }
 }

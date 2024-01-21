@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class InvitationResponseDto {
 
@@ -15,6 +16,14 @@ public class InvitationResponseDto {
     @AllArgsConstructor
     public static class InvitationDto {
         Long id;
-        LocalDateTime createdTime;
+        LocalDateTime createdAt;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class InvitationListDto {
+        List<InvitationDto> invitationDtoList;
     }
 }
