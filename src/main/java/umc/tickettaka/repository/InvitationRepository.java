@@ -5,6 +5,9 @@ import umc.tickettaka.domain.Invitation;
 import umc.tickettaka.domain.Member;
 import umc.tickettaka.domain.Team;
 
+import java.util.Optional;
+
 public interface InvitationRepository extends JpaRepository<Invitation, Long> {
-    boolean existsBySenderAndReceiverAndTeam(Member sender, Member receiver, Team team);
+    Optional<Invitation> findByReceiverAndTeam(Member receiver, Team team);
 }
+

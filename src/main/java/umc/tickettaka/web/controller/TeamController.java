@@ -30,30 +30,31 @@ public class TeamController {
 
     private final TeamCommandService teamCommandService;
     private final TeamQueryService teamQueryService;
-    private final MemberQueryService memberQueryService;
     private final InvitationCommandService invitationCommandService;
     private final InvitationQueryService invitationQueryService;
 
     @PostMapping(value = "/create", consumes = {MediaType.APPLICATION_JSON_VALUE , MediaType.MULTIPART_FORM_DATA_VALUE})
-    @Operation(summary = "Team 생성 API", description = "Team 생성하는 API")
+    @Operation(summary = "팀 생성", description = "팀 생성하기")
     public ApiResponse<TeamResponseDto.TeamDto> createTeam(
         @AuthUser Member member,
         @RequestPart(value = "image", required = false) MultipartFile image,
-        @RequestPart(value = "request") TeamRequestDto.TeamDto request) throws IOException {
+        @RequestPart(value = "request") TeamRequestDto.CreateTeamDto request) throws IOException {
         Team team = teamCommandService.createTeam(member, image, request);
         return ApiResponse.onCreate(TeamConverter.toTeamResultDto(team));
     }
 
     @GetMapping("")
-    @Operation(summary = "생성된 Team 조회 API", description = "생성된 Team 조회하는 API")
-    public ApiResponse<TeamResponseDto.TeamListDto> getTeamList() {
-        List<Team> teamList = teamQueryService.findAll();
-        TeamResponseDto.TeamListDto teamListDto = TeamConverter.toTeamListDto(teamList);
-        return ApiResponse.onSuccess(teamListDto);
+    @Operation(summary = "생성된 팀 목록, 초대 팀 목록 조회", description = "생성된 팀, 초대 목록 조회하기")
+    public ApiResponse<TeamResponseDto.TeamAndInvitationListDto> getTeamList(
+            @AuthUser Member receiver
+    ) {
+        List<Team> teamList = teamQueryService.findTeamsByMember(receiver);
+        List<Invitation> invitationList = invitationQueryService.findAll();
+        return ApiResponse.onSuccess(TeamConverter.teamAndInvitationListDto(receiver, teamList, invitationList));
     }
 
     @GetMapping("/{teamsId}")
-    @Operation(summary = "특정 팀 조회 API",description = "특정 팀 조회하는 API")
+    @Operation(summary = "특정 팀 조회",description = "특정 팀 조회하기")
     @Parameter(name = "teamsId", description = "팀의 아이디, path variable 입니다.")
     public ApiResponse<TeamResponseDto.TeamDto> getTeam(@PathVariable(name = "teamsId") Long teamsId ) {
         Team team = teamQueryService.findTeam(teamsId);
@@ -61,69 +62,68 @@ public class TeamController {
     }
 
     @PatchMapping(value = "/{teamsId}/update", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    @Operation(summary = "팀 정보 수정 API", description = "팀 정보를 업데이트하는 API")
+    @Operation(summary = "팀 정보 수정", description = "팀 정보 수정하기")
     @Parameter(name = "teamsId", description = "팀의 아이디, path variable 입니다.")
     public ApiResponse<TeamResponseDto.TeamDto> updateTeam(
             @PathVariable(name = "teamsId") Long teamsId,
             @RequestPart(value = "image", required = false) MultipartFile image,
-            @RequestPart TeamRequestDto.TeamDto request) throws IOException{
+            @RequestPart TeamRequestDto.CreateTeamDto request) throws IOException{
         Team updatedTeam = teamCommandService.updateTeam(teamsId, image, request);
         return ApiResponse.onSuccess(TeamConverter.toTeamResultDto(updatedTeam));
     }
 
     @DeleteMapping("/{teamsId}")
-    @Operation(summary = "팀 삭제 API", description = "팀을 삭제하는 API, 삭제하면 Response는 가입된 전체 팀이 조회됩니다.")
-    @Parameters({
-            @Parameter(name = "teamsId", description = "팀의 아이디, path variable 입니다.")
-    })
-    public ApiResponse<TeamResponseDto.TeamListDto> deleteTeam(@PathVariable(name = "teamsId") Long teamsId) throws IOException{
+    @Operation(summary = "팀 삭제", description = "팀을 삭제하기, 삭제하면 Response는 가입된 전체 팀이 조회됩니다.")
+    @Parameter(name = "teamsId", description = "팀의 아이디, path variable 입니다.")
+    public ApiResponse<TeamResponseDto.TeamAndInvitationListDto> deleteTeam(
+            @PathVariable(name = "teamsId") Long teamsId,
+            @AuthUser Member member) throws IOException{
         teamCommandService.deleteTeam(teamsId);
         List<Team> teamList = teamQueryService.findAll();
-        TeamResponseDto.TeamListDto teamListDto = TeamConverter.toTeamListDto(teamList);
-        return ApiResponse.onSuccess(teamListDto);
+        List<Invitation> invitationList = invitationQueryService.findAll();
+        return ApiResponse.onSuccess(TeamConverter.teamAndInvitationListDto(member, teamList, invitationList));
     }
 
     @PostMapping("/{teamsId}/invite")
-    @Operation(summary = "팀에 멤버 초대 API", description = "팀에 멤버 초대 API")
+    @Operation(summary = "팀에 멤버 초대", description = "팀에 멤버 초대하기")
     @Parameter(name = "teamsId", description = "팀의 아이디, path variable 입니다.")
-    public ApiResponse<InvitationResponseDto.InvitationDto> inviteTeam(
+    public ApiResponse<TeamResponseDto.TeamDto> inviteTeam(
             @PathVariable(name = "teamsId") Long teamsId,
             @AuthUser Member sender,
-            @RequestBody InvitationRequestDto.InvitationDto request) throws IOException {
+            @RequestBody InvitationRequestDto.CreateInvitationDto request) throws IOException {
 
         Team team = teamQueryService.findTeam(teamsId);
-        Member receiver = memberQueryService.findByUsername(request.getReceiverUsername());
-        Invitation invitation = invitationCommandService.sendInvitation(sender, team, receiver);
-
-        return ApiResponse.onSuccess(InvitationConverter.invitationDto(invitation));
+        invitationCommandService.sendInvitation(sender, team, request);
+        return ApiResponse.onSuccess(TeamConverter.toTeamResultDto(team));
     }
 
     @GetMapping("/invite/")
-    @Operation(summary = "초대된 팀 목록 API", description = "초대된 팀 목록(수락/거절) API")
+    @Operation(summary = "초대된 팀 목록", description = "초대된 팀 목록(수락/거절) 조회하기")
     public ApiResponse<InvitationResponseDto.InvitationListDto> getInvitationList(
             @AuthUser Member member) {
         List<Invitation> invitationList = invitationQueryService.findAll();
-        InvitationResponseDto.InvitationListDto invitationListDto = InvitationConverter.toInvitationListDto(member, invitationList);
-        return ApiResponse.onSuccess(invitationListDto);
+        return ApiResponse.onSuccess(InvitationConverter.toInvitationListDto(member, invitationList));
     }
 
-    @PatchMapping("/invite/accept")
+    @PatchMapping("")
     @Operation(summary = "팀에 멤버 초대 수락 API", description = "팀에 멤버 초대 수락 API")
     @Parameter(name = "invitationId")
-    public ApiResponse<InvitationResponseDto.InvitationDto> acceptTeam(
+    public ApiResponse<InvitationResponseDto.InvitationListDto> acceptTeam(
             @RequestParam(name = "invitationId") Long invitationId,
             @AuthUser Member receiver) throws IOException {
-        Invitation invitation = invitationCommandService.acceptInvitation(invitationId, receiver);
-        return ApiResponse.onSuccess(InvitationConverter.invitationDto(invitation));
+        List<Invitation> invitationList = invitationQueryService.findAll();
+        invitationCommandService.acceptInvitation(invitationId, receiver);
+        return ApiResponse.onSuccess(InvitationConverter.toInvitationListDto(receiver, invitationList));
     }
 
-    @PatchMapping("/invite/reject")
-    @Operation(summary = "팀에 멤버 초대 거절 API", description = "팀에 멤버 초대 거절 API")
+    @DeleteMapping("")
+    @Operation(summary = "팀에 멤버 초대 거절", description = "팀에 멤버 초대 거절하기, 거절하면 Response는 초대 리스트가 조회됩니다.")
     @Parameter(name = "invitationId")
-    public ApiResponse<InvitationResponseDto.InvitationDto> rejectTeam(
+    public ApiResponse<InvitationResponseDto.InvitationListDto> rejectTeam(
             @RequestParam(name = "invitationId") Long invitationId,
             @AuthUser Member receiver) throws IOException {
-        Invitation invitation = invitationCommandService.rejectInvitation(invitationId, receiver);
-        return ApiResponse.onSuccess(InvitationConverter.invitationDto(invitation));
+        invitationCommandService.rejectInvitation(invitationId, receiver);
+        List<Invitation> invitationList = invitationQueryService.findAll();
+        return ApiResponse.onSuccess(InvitationConverter.toInvitationListDto(receiver, invitationList));
     }
 }

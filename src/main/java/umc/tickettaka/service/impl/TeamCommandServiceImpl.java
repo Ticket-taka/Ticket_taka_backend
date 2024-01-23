@@ -2,6 +2,7 @@ package umc.tickettaka.service.impl;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import umc.tickettaka.domain.Invitation;
 import umc.tickettaka.domain.Member;
 import umc.tickettaka.domain.Project;
 import umc.tickettaka.domain.Team;
-import umc.tickettaka.domain.enums.InvitationStatus;
 import umc.tickettaka.domain.mapping.MemberTeam;
 import umc.tickettaka.domain.mapping.ScheduleTeam;
 import umc.tickettaka.repository.InvitationRepository;
@@ -35,10 +35,11 @@ public class TeamCommandServiceImpl implements TeamCommandService {
     private final MemberTeamRepository memberTeamRepository;
     private final MemberQueryService memberQueryService;
     private final TeamQueryService teamQueryService;
+    private final InvitationRepository invitationRepository;
 
     @Override
     @Transactional
-    public Team createTeam(Member member, MultipartFile image, TeamRequestDto.TeamDto request) throws IOException {
+    public Team createTeam(Member member, MultipartFile image, TeamRequestDto.CreateTeamDto request) throws IOException {
         String imageUrl = imageUploadService.uploadImage(image);
         Team team = TeamConverter.toTeam(request, imageUrl);
         Team newTeam = teamRepository.save(team);
@@ -48,19 +49,23 @@ public class TeamCommandServiceImpl implements TeamCommandService {
     }
 
     private void setMemberTeam(Member creator, Team team, List<String> invitedUsernameList) {
-        List<MemberTeam> memberTeamList = new java.util.ArrayList<>(invitedUsernameList.stream()
+        List<Invitation> invitationList = invitedUsernameList.stream()
                 .map(username ->
-                        MemberTeam.builder()
+                        Invitation.builder()
+                                .sender(creator)
+                                .receiver(memberQueryService.findByUsername(username))
                                 .team(team)
-                                .member(memberQueryService.findByUsername(username))
-                                .build()).toList());
+                                .build())
+                .collect(Collectors.toList());
 
-        memberTeamList.add(MemberTeam.builder().team(team).member(creator).build());
-        memberTeamRepository.saveAll(memberTeamList);
+        invitationRepository.saveAll(invitationList);
+
+        MemberTeam creatorMemberTeam = MemberTeam.builder().team(team).member(creator).build();
+        memberTeamRepository.save(creatorMemberTeam);
     }
 
     @Override
-    public Team updateTeam(Long id, MultipartFile image, TeamRequestDto.TeamDto request) throws IOException {
+    public Team updateTeam(Long id, MultipartFile image, TeamRequestDto.CreateTeamDto request) throws IOException {
         Team team = teamQueryService.findTeam(id);
         String imageUrl = team.getImageUrl();
         List<MemberTeam> memberTeamList = team.getMemberTeamList();
