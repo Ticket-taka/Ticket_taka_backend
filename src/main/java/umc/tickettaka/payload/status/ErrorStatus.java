@@ -52,6 +52,8 @@ public enum ErrorStatus implements BaseErrorCode {
     //INVITATION Error
     INVITATION_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "INVITATION4000", "The user is already invited to the team."),
     INVITATION_NOT_FOUND(HttpStatus.NOT_FOUND, "INVITATION4001", "INVITATION Not found"),
+    //MEMBERTEAM Error
+    MEMBER_TEAM_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "MEMBERTEAM4000", "The user is already joined to the team"),
     //SNS LOGIN Error
     SNS_LOGIN_WRONG_INFORMATION(HttpStatus.BAD_REQUEST, "SNS4003", "SNS information you entered is not valid.");
 

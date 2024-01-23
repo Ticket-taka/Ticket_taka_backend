@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import umc.tickettaka.domain.common.BaseEntity;
-import umc.tickettaka.domain.enums.InvitationStatus;
 
 @Entity
 @Getter
@@ -27,6 +26,4 @@ public class Invitation extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
-    @Enumerated(EnumType.STRING)
-    private InvitationStatus status;
 }

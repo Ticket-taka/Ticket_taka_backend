@@ -26,7 +26,8 @@ public class TeamResponseDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class TeamListDto {
+    public static class TeamAndInvitationListDto {
         List<TeamDto> teamDtoList;
+        List<InvitationResponseDto.InvitationDto> invitationDtoList;
     }
 }

@@ -16,6 +16,7 @@ public class InvitationResponseDto {
     @AllArgsConstructor
     public static class InvitationDto {
         Long id;
+        Long teamsId;
         LocalDateTime createdAt;
     }
 

@@ -5,7 +5,7 @@ import lombok.Getter;
 public class InvitationRequestDto {
 
     @Getter
-    public static class InvitationDto {
+    public static class CreateInvitationDto {
         String receiverUsername;
     }
 }

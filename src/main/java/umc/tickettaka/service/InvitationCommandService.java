@@ -8,7 +8,7 @@ import umc.tickettaka.web.dto.request.TeamRequestDto;
 
 import java.io.IOException;
 public interface InvitationCommandService {
-    Invitation sendInvitation(Member sender, Team team, Member receiver);
-    Invitation acceptInvitation(Long id, Member receiver);
-    Invitation rejectInvitation(Long id, Member receiver);
+    Invitation sendInvitation(Member sender, Team team, InvitationRequestDto.CreateInvitationDto request);
+    void acceptInvitation(Long id, Member receiver);
+    void rejectInvitation(Long id, Member receiver);
 }
