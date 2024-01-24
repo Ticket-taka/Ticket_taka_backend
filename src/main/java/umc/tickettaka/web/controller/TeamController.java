@@ -90,10 +90,10 @@ public class TeamController {
     public ApiResponse<TeamResponseDto.TeamDto> inviteTeam(
             @PathVariable(name = "teamsId") Long teamsId,
             @AuthUser Member sender,
-            @RequestBody InvitationRequestDto.CreateInvitationDto request) throws IOException {
+            @RequestParam(name = "receiver") String receiverUsername) {
 
         Team team = teamQueryService.findTeam(teamsId);
-        invitationCommandService.sendInvitation(sender, team, request);
+        invitationCommandService.sendInvitation(sender, team, receiverUsername);
         return ApiResponse.onSuccess(TeamConverter.toTeamResultDto(team));
     }
 
@@ -105,25 +105,22 @@ public class TeamController {
         return ApiResponse.onSuccess(InvitationConverter.toInvitationListDto(member, invitationList));
     }
 
-    @PatchMapping("")
-    @Operation(summary = "팀에 멤버 초대 수락 API", description = "팀에 멤버 초대 수락 API")
-    @Parameter(name = "invitationId")
-    public ApiResponse<InvitationResponseDto.InvitationListDto> acceptTeam(
+    @PostMapping("")
+    @Operation(summary = "팀에 멤버 초대 수락/거절", description = "팀에 멤버 초대 수락/거절")
+    public ApiResponse<TeamResponseDto.TeamAndInvitationListDto> acceptOrRejectTeam(
             @RequestParam(name = "invitationId") Long invitationId,
-            @AuthUser Member receiver) throws IOException {
-        List<Invitation> invitationList = invitationQueryService.findAll();
-        invitationCommandService.acceptInvitation(invitationId, receiver);
-        return ApiResponse.onSuccess(InvitationConverter.toInvitationListDto(receiver, invitationList));
-    }
+            @RequestParam(name = "isAccepted") boolean isAccepted,
+            @AuthUser Member receiver) {
 
-    @DeleteMapping("")
-    @Operation(summary = "팀에 멤버 초대 거절", description = "팀에 멤버 초대 거절하기, 거절하면 Response는 초대 리스트가 조회됩니다.")
-    @Parameter(name = "invitationId")
-    public ApiResponse<InvitationResponseDto.InvitationListDto> rejectTeam(
-            @RequestParam(name = "invitationId") Long invitationId,
-            @AuthUser Member receiver) throws IOException {
-        invitationCommandService.rejectInvitation(invitationId, receiver);
+        if (isAccepted) {
+            invitationCommandService.acceptInvitation(invitationId, receiver);
+        } else {
+            invitationCommandService.rejectInvitation(invitationId, receiver);
+        }
+
         List<Invitation> invitationList = invitationQueryService.findAll();
-        return ApiResponse.onSuccess(InvitationConverter.toInvitationListDto(receiver, invitationList));
+        List<Team> teamList = teamQueryService.findTeamsByMember(receiver);
+
+        return ApiResponse.onSuccess(TeamConverter.teamAndInvitationListDto(receiver, teamList, invitationList));
     }
 }

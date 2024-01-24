@@ -19,14 +19,6 @@ public class InvitationConverter {
                 .build();
     }
 
-    public static Invitation toInvitation (Team team, Member sender, Member receiver) {
-        return Invitation.builder()
-                .team(team)
-                .sender(sender)
-                .receiver(receiver)
-                .build();
-    }
-
     public static InvitationResponseDto.InvitationListDto toInvitationListDto(Member member, List<Invitation> invitationList) {
         List<InvitationResponseDto.InvitationDto> invitationDtoList = invitationList.stream()
                 .filter(invitation -> member.getId().equals(invitation.getReceiver().getId()))

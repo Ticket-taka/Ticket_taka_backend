@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import umc.tickettaka.domain.Invitation;
 import umc.tickettaka.domain.Member;
 import umc.tickettaka.domain.Team;
+import umc.tickettaka.domain.enums.Color;
 import umc.tickettaka.domain.mapping.MemberTeam;
 import umc.tickettaka.payload.exception.GeneralException;
 import umc.tickettaka.payload.status.ErrorStatus;
@@ -35,13 +36,18 @@ public class InvitationCommandServiceImpl implements InvitationCommandService {
 
     @Override
     @Transactional
-    public Invitation sendInvitation(Member sender, Team team, InvitationRequestDto.CreateInvitationDto request) {
-        Member receiver = memberQueryService.findByUsername(request.getReceiverUsername());
+    public Invitation sendInvitation(Member sender, Team team, String receiverUsername) {
+        Member receiver = memberQueryService.findByUsername(receiverUsername);
 
+        Optional<MemberTeam> existingMemberTeam = memberTeamRepository.findByTeamAndMember(team, receiver);
         Optional<Invitation> invitationOptional = invitationRepository.findByReceiverAndTeam(receiver, team);
-        if (invitationOptional.isPresent()) {
+
+        existingMemberTeam.ifPresent(memberTeam -> {
+            throw new GeneralException(ErrorStatus.MEMBER_TEAM_ALREADY_EXIST);
+        });
+        invitationOptional.ifPresent(invitation -> {
             throw new GeneralException(ErrorStatus.INVITATION_ALREADY_EXIST);
-        }
+        });
 
         Invitation invitation = Invitation.builder()
                 .sender(sender)
@@ -68,7 +74,7 @@ public class InvitationCommandServiceImpl implements InvitationCommandService {
 
             MemberTeam newMemberTeam = MemberTeam.builder()
                     .team(team)
-//                    .color()  멤버별 color설정
+                    .color(Color.getRandomColor())
                     .member(receiver)
                     .build();
 

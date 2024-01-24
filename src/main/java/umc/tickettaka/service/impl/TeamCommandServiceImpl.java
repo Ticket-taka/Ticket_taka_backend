@@ -14,6 +14,7 @@ import umc.tickettaka.domain.Invitation;
 import umc.tickettaka.domain.Member;
 import umc.tickettaka.domain.Project;
 import umc.tickettaka.domain.Team;
+import umc.tickettaka.domain.enums.Color;
 import umc.tickettaka.domain.mapping.MemberTeam;
 import umc.tickettaka.domain.mapping.ScheduleTeam;
 import umc.tickettaka.repository.InvitationRepository;
@@ -43,26 +44,27 @@ public class TeamCommandServiceImpl implements TeamCommandService {
         String imageUrl = imageUploadService.uploadImage(image);
         Team team = TeamConverter.toTeam(request, imageUrl);
         Team newTeam = teamRepository.save(team);
+
         setMemberTeam(member, newTeam, request.getInvitedUsernameList());
 
         return newTeam;
     }
 
     private void setMemberTeam(Member creator, Team team, List<String> invitedUsernameList) {
+        sendInvitationsForMemberList(creator, team, invitedUsernameList);
+        MemberTeam creatorMemberTeam = MemberTeam.builder().team(team).member(creator).color(Color.getRandomColor()).build();
+        memberTeamRepository.save(creatorMemberTeam);
+    }
+
+    private void sendInvitationsForMemberList(Member sender, Team team, List<String> invitedUsernameList) {
         List<Invitation> invitationList = invitedUsernameList.stream()
-                .map(username ->
-                        Invitation.builder()
-                                .sender(creator)
+                .map(username -> Invitation.builder()
+                                .sender(sender)
                                 .receiver(memberQueryService.findByUsername(username))
                                 .team(team)
                                 .build())
                 .collect(Collectors.toList());
-
-        invitationRepository.saveAll(invitationList);
-
-        MemberTeam creatorMemberTeam = MemberTeam.builder().team(team).member(creator).build();
-        memberTeamRepository.save(creatorMemberTeam);
-    }
+        invitationRepository.saveAll(invitationList);    }
 
     @Override
     public Team updateTeam(Long id, MultipartFile image, TeamRequestDto.CreateTeamDto request) throws IOException {

@@ -2,6 +2,10 @@ package umc.tickettaka.domain.enums;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 @RequiredArgsConstructor
 public enum Color {
     //todo 디자이너님께 색상 리스트 받아서 추가
@@ -49,5 +53,11 @@ public enum Color {
     }
     public String getHex() {
         return hex;
+    }
+
+    public static Color getRandomColor() {
+        List<Color> colors = Arrays.asList(values());
+        Collections.shuffle(colors);
+        return colors.get(0);
     }
 }
