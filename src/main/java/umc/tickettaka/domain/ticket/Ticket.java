@@ -34,21 +34,32 @@ public class Ticket extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Long sequence;
+
+    private Long teamId;
+
     @Column(length = 50)
     private String title;
+
     @Column(length = 500)
     private String description;
+
     private LocalDate startTime;
+
     private LocalDate endTime;
+
     @Enumerated(EnumType.STRING)
     private TicketStatus status;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "timeline_id")
     private Timeline timeline;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "worker_id")
     private Member worker;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "next_ticket_id")
     private Ticket nextTicket;
