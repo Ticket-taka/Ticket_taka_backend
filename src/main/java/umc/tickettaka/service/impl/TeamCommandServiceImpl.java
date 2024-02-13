@@ -52,7 +52,7 @@ public class TeamCommandServiceImpl implements TeamCommandService {
 
     private void setMemberTeam(Member creator, Team team, List<String> invitedUsernameList) {
         sendInvitationsForMemberList(creator, team, invitedUsernameList);
-        MemberTeam creatorMemberTeam = MemberTeam.builder().team(team).member(creator).color(Color.getRandomColor()).build();
+        MemberTeam creatorMemberTeam = MemberTeam.builder().team(team).color(MemberTeam.getUnusedRandomColor()).member(creator).build();
         memberTeamRepository.save(creatorMemberTeam);
     }
 

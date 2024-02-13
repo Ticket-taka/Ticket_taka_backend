@@ -78,15 +78,12 @@ public class InvitationCommandServiceImpl implements InvitationCommandService {
 
         if (receiver.getId().equals(invitation.getReceiver().getId())) {
             Optional<MemberTeam> existingMemberTeam = memberTeamRepository.findByTeamAndMember(team, receiver);
-            Color newColor;
 
             if (existingMemberTeam.isPresent()) {
                 throw new GeneralException(ErrorStatus.MEMBER_TEAM_ALREADY_EXIST);
             }
 
-            do {
-                newColor = Color.getRandomColor();
-            } while (teamCommandService.isColorAlreadyUsedInTeam(team, newColor));
+            Color newColor = MemberTeam.getUnusedRandomColor();
 
             List<MemberTeam> memberTeamList = new ArrayList<>();
 

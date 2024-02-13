@@ -1,14 +1,6 @@
 package umc.tickettaka.domain.mapping;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +10,11 @@ import umc.tickettaka.domain.Member;
 import umc.tickettaka.domain.Team;
 import umc.tickettaka.domain.common.BaseEntity;
 import umc.tickettaka.domain.enums.Color;
+import umc.tickettaka.payload.exception.GeneralException;
+import umc.tickettaka.payload.status.ErrorStatus;
 import umc.tickettaka.web.dto.request.MemberTeamRequestDto;
+
+import java.util.*;
 
 @Entity
 @Getter
@@ -46,5 +42,21 @@ public class MemberTeam extends BaseEntity {
                 this.color = newColor;
             }
         }
+    }
+
+    @Transient
+    private static final Set<Color> allocatedColorList = new HashSet<>();
+
+    public static Color getUnusedRandomColor() {
+        List<Color> allColors = Arrays.asList(Color.values());
+
+        for (Color color : allColors) {
+            if (!allocatedColorList.contains(color)) {
+                allocatedColorList.add(color);
+                return color;
+            }
+        }
+
+        throw new GeneralException(ErrorStatus.COLOR_ALREADY_USED_IN_TEAM);
     }
 }
