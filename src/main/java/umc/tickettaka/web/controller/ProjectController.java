@@ -13,9 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 import umc.tickettaka.converter.ProjectConverter;
 import umc.tickettaka.domain.Project;
 import umc.tickettaka.payload.ApiResponse;
+import umc.tickettaka.repository.Project.ProjectRepository;
 import umc.tickettaka.service.MemberCommandService;
 import umc.tickettaka.service.ProjectCommandService;
-import umc.tickettaka.service.ProjectQueryService;
 import umc.tickettaka.web.dto.common.CommonMemberDto;
 import umc.tickettaka.web.dto.request.ProjectRequestDto;
 import umc.tickettaka.web.dto.response.ProjectResponseDto;
@@ -28,14 +28,14 @@ public class ProjectController {
 
     private final MemberCommandService memberCommandService;
     private final ProjectCommandService projectCommandService;
-    private final ProjectQueryService projectQueryService;
+    private final ProjectRepository projectRepository;
 
     @GetMapping("")
     @Operation(summary = "팀 공간 창 (참여 팀원, 모든 project 표시)")
     public ApiResponse<ProjectResponseDto.ShowProjectListDto> allProjects(
             @PathVariable(name = "teamId") Long teamId) {
         CommonMemberDto.ShowMemberProfileListDto memberProfileList = memberCommandService.getCommonMemberDto(teamId);
-        List<Project> projectList = projectQueryService.findAllByTeamId(teamId);
+        List<Project> projectList = projectRepository.findAllByTeamId(teamId);
 
         return ApiResponse.onSuccess(ProjectConverter.toShowProjectListDto(memberProfileList, projectList));
     }

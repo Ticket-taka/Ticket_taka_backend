@@ -20,6 +20,7 @@ import umc.tickettaka.domain.mapping.TicketReviewer;
 import umc.tickettaka.domain.ticket.Feedback;
 import umc.tickettaka.domain.ticket.Ticket;
 import umc.tickettaka.repository.FeedbackRepository;
+import umc.tickettaka.repository.Project.ProjectRepository;
 import umc.tickettaka.repository.TicketRepository;
 import umc.tickettaka.repository.TicketReviewerRepository;
 import umc.tickettaka.service.*;
@@ -43,14 +44,14 @@ public class TicketCommandServiceImpl implements TicketCommandService {
     private final TicketRepository ticketRepository;
     private final TeamQueryService teamQueryService;
     private final MemberTeamQueryService memberTeamQueryService;
-    private final ProjectQueryService projectQueryService;
+    private final ProjectRepository projectRepository;
 
     @Override
     @Transactional
     public Ticket createTicket(Long timelineId, CreateTicketDto request) {
 
         Timeline timeline = timelineQueryService.findById(timelineId);
-        Project project = projectQueryService.findByTimeline(timeline);
+        Project project = projectRepository.findByTimeline(timeline);
         Team team = teamQueryService.findTeamByProjectAndTimeline(project, timelineId);
         Member worker = memberQueryService.findByUsername(request.getWorkerName());
         MemberTeam memberTeam = memberTeamQueryService.findByTeamAndMember(team, worker);

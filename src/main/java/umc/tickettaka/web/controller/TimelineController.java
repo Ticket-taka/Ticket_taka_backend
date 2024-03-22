@@ -16,7 +16,7 @@ import umc.tickettaka.converter.TimelineConverter;
 import umc.tickettaka.domain.Project;
 import umc.tickettaka.domain.Timeline;
 import umc.tickettaka.payload.ApiResponse;
-import umc.tickettaka.service.ProjectQueryService;
+import umc.tickettaka.repository.Project.ProjectRepository;
 import umc.tickettaka.service.TimelineCommandService;
 import umc.tickettaka.service.TimelineQueryService;
 import umc.tickettaka.web.dto.request.TimelineRequestDto;
@@ -30,7 +30,7 @@ public class TimelineController {
 
     private final TimelineCommandService timelineCommandService;
     private final TimelineQueryService timelineQueryService;
-    private final ProjectQueryService projectQueryService;
+    private final ProjectRepository projectRepository;
 
     @GetMapping
     @Operation(summary = "모든 Timeline 조회")
@@ -38,7 +38,7 @@ public class TimelineController {
         @Parameter(name = "projectId", description = "프로젝트 아이디 : Path Variable")
     })
     public ApiResponse<TimelineResponseDto.ShowTimelineListDto> allTimelines(@PathVariable Long projectId) {
-        Project project = projectQueryService.findById(projectId);
+        Project project = projectRepository.findProjectById(projectId);
         List<Timeline> timelineList = timelineQueryService.findAllByProjectId(projectId);
         return ApiResponse.onSuccess(TimelineConverter.toShowTimelineListDto(project.getName(), timelineList));
     }
@@ -66,7 +66,7 @@ public class TimelineController {
     public ApiResponse<TimelineResponseDto.ShowTimelineListDto> deleteTimelines(
             @PathVariable(name = "projectId") Long projectId,
             @PathVariable(name = "timelineId") Long timelineId) {
-        Project project = projectQueryService.findById(projectId);
+        Project project = projectRepository.findProjectById(projectId);
         timelineCommandService.deleteTimeline(timelineId);
         List<Timeline> timelineList = timelineQueryService.findAllByProjectId(projectId);
 
@@ -81,7 +81,7 @@ public class TimelineController {
     public ApiResponse<TimelineResponseDto.ShowTimelineListDto> deleteManyTimelines(
             @PathVariable(name = "projectId") Long projectId,
             @RequestBody @Valid TimelineRequestDto.DeleteTimelineListDto deleteTimelineListDto) {
-        Project project = projectQueryService.findById(projectId);
+        Project project = projectRepository.findProjectById(projectId);
         List<Long> timelineIdList = deleteTimelineListDto.getTimelineIdList();
 
         for (Long timelineId : timelineIdList) {

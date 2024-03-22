@@ -13,7 +13,7 @@ import umc.tickettaka.domain.Member;
 import umc.tickettaka.domain.Project;
 import umc.tickettaka.domain.Team;
 import umc.tickettaka.domain.mapping.MemberTeam;
-import umc.tickettaka.repository.ProjectRepository;
+import umc.tickettaka.repository.Project.ProjectRepository;
 import umc.tickettaka.service.*;
 import umc.tickettaka.web.dto.request.ProjectRequestDto;
 import umc.tickettaka.web.dto.response.ProjectResponseDto;
@@ -26,7 +26,6 @@ public class ProjectCommandServiceImpl implements ProjectCommandService {
     private final TeamQueryService teamQueryService;
     private final ImageUploadService imageUploadService;
     private final ProjectRepository projectRepository;
-    private final ProjectQueryService projectQueryService;
     private final TicketCommandService ticketCommandService;
 
     @Override
@@ -49,7 +48,7 @@ public class ProjectCommandServiceImpl implements ProjectCommandService {
     @Transactional
     public ProjectResponseDto.ProjectMainDto getProjectMainDto(Long teamId, Long projectId) {
         Team team = teamQueryService.findTeam(teamId);
-        Project project = projectQueryService.findById(projectId);
+        Project project = projectRepository.findProjectById(projectId);
         List<TicketResponseDto.MemberAchieveLevelDto> memberAchieveLevelDtoList = new ArrayList<>();
 
         for(MemberTeam memberTeam : team.getMemberTeamList()) {
@@ -67,7 +66,7 @@ public class ProjectCommandServiceImpl implements ProjectCommandService {
     @Override
     @Transactional
     public Project updateProject(Long teamId, Long projectId, MultipartFile image, ProjectRequestDto.UpdateProjectDto updateProjectDto) throws IOException {
-        Project project = projectQueryService.findById(projectId);
+        Project project = projectRepository.findProjectById(projectId);
         String imageUrl = project.getImageUrl();
 
         if (image != null) {
@@ -83,7 +82,7 @@ public class ProjectCommandServiceImpl implements ProjectCommandService {
     @Transactional
     public void deleteProject(Long teamId, Long projectId) {
 
-        Project project = projectQueryService.findById(projectId);
+        Project project = projectRepository.findProjectById(projectId);
         projectRepository.delete(project);
     }
 }
